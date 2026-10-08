@@ -5,12 +5,14 @@ export default async function ClienteLayout({ children }: { children: React.Reac
   const user = await requirePageRole("CLIENT");
   return (
     <AppShell
-      layout="top"
+      layout="sidebar"
       user={{ name: user.name, email: user.email, roleLabel: "Cliente" }}
       nav={[
-        { href: "/cliente", label: "Meus horários", icon: "calendar", exact: true },
-        { href: "/cliente/agendar", label: "Novo agendamento", icon: "plus" },
-        { href: "/cliente/perfil", label: "Meus dados", icon: "user" },
+        { href: "/cliente", label: "Início", icon: "house", exact: true },
+        { href: "/cliente/agendamentos", label: "Agendamentos", icon: "calendar" },
+        { href: "/cliente/clube", label: "Clube do Mandu", icon: "card" },
+        { href: "/cliente/plano", label: "Plano", icon: "layers" },
+        { href: "/cliente/perfil", label: "Perfil", icon: "user" },
       ]}
     >
       {children}

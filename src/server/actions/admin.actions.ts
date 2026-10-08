@@ -5,6 +5,8 @@ import * as catalog from "@/server/services/catalog.service";
 import * as clients from "@/server/services/client.service";
 import { clearBarberHours, saveWeeklyHours } from "@/server/services/business-hours.service";
 import { updateShopSettings } from "@/server/services/settings.service";
+import { redeemReward } from "@/server/services/loyalty.service";
+import * as plans from "@/server/services/plan.service";
 import { idSchema } from "@/validations/common";
 import { withActor } from "./run-action";
 
@@ -53,4 +55,26 @@ export async function clearBarberHoursAction(barberId: unknown) {
 }
 export async function updateSettingsAction(input: unknown) {
   return withActor([...ADMIN], async (a) => void (await updateShopSettings(a, input)), { revalidate: PUBLIC_AND_ADMIN, message: "Configurações salvas." });
+}
+
+// Planos e assinaturas
+export async function createPlanAction(input: unknown) {
+  return withActor([...ADMIN], async (a) => void (await plans.createPlan(a, input)), { revalidate: ["/admin", "/cliente"], message: "Plano criado." });
+}
+export async function updatePlanAction(id: unknown, input: unknown) {
+  return withActor([...ADMIN], (a) => plans.updatePlan(a, id, input), { revalidate: ["/admin", "/cliente"], message: "Plano atualizado." });
+}
+export async function setPlanActiveAction(input: unknown) {
+  return withActor([...ADMIN], (a) => plans.setPlanActive(a, input), { revalidate: ["/admin", "/cliente"], message: "Status atualizado." });
+}
+export async function activateSubscriptionAction(id: unknown) {
+  return withActor([...ADMIN], (a) => plans.activateSubscription(a, id), { revalidate: ["/admin", "/cliente"], message: "Assinatura ativada." });
+}
+export async function adminCancelSubscriptionAction(id: unknown) {
+  return withActor([...ADMIN], (a) => plans.cancelSubscription(a, id), { revalidate: ["/admin", "/cliente"], message: "Assinatura cancelada." });
+}
+
+// Clube do Mandu
+export async function redeemRewardAction(clientId: unknown) {
+  return withActor([...ADMIN], (a) => redeemReward(a, clientId), { revalidate: ["/admin", "/cliente"], message: "Recompensa resgatada." });
 }

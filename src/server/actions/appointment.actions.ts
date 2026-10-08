@@ -1,6 +1,5 @@
 "use server";
 
-import type { AppointmentFilters } from "@/validations/appointment";
 import * as appointments from "@/server/services/appointment.service";
 import { getAvailability } from "@/server/services/availability.service";
 import { withActor } from "./run-action";
@@ -55,8 +54,4 @@ export async function updateNotesAction(input: unknown) {
     revalidate: ALL_PANELS,
     message: "Observações salvas.",
   });
-}
-
-export async function listAppointmentsAction(filters: AppointmentFilters) {
-  return withActor(["BARBER", "ADMIN"], (actor) => appointments.listAppointments(actor, filters));
 }

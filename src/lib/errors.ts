@@ -26,6 +26,9 @@ export const ERROR_MESSAGES = {
   INVALID_TOKEN: "Link inválido ou expirado. Solicite uma nova redefinição de senha.",
   WRONG_PASSWORD: "Senha atual incorreta.",
   INVALID_HOURS: "Horário de funcionamento inválido.",
+  NO_REWARD_AVAILABLE: "O cliente não possui recompensas disponíveis para resgate.",
+  SUBSCRIPTION_EXISTS: "Você já possui um plano ativo ou uma solicitação em andamento.",
+  PLAN_INACTIVE: "Este plano não está disponível no momento.",
   INTERNAL: "Algo deu errado. Tente novamente em instantes.",
 } as const;
 

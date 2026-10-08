@@ -128,8 +128,31 @@ export const settingsSchema = z.object({
   minAdvanceMinutes: z.coerce.number().int().min(0).max(7 * 24 * 60),
   maxAdvanceDays: z.coerce.number().int().min(1).max(365),
   cancellationNoticeHours: z.coerce.number().int().min(0).max(168),
+  loyaltyGoal: z.coerce.number().int().min(1, "Mínimo de 1 atendimento.").max(100),
+  loyaltyReward: text({ min: 3, max: 80, label: "Recompensa" }),
 });
 export type SettingsFormInput = z.input<typeof settingsSchema>;
 
 // ---------------- Clientes (admin) ----------------
 export const toggleActiveSchema = z.object({ id: idSchema, active: z.boolean() });
+
+// ---------------- Planos ----------------
+export const planSchema = z.object({
+  name: text({ min: 2, max: 80, label: "Nome" }),
+  description: optionalText({ max: 300, label: "Descrição", multiline: true }),
+  benefits: z
+    .string()
+    .max(1000, "Benefícios muito longos.")
+    .optional()
+    .transform((v) => {
+      const lines = (v ?? "").split("\n").map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean);
+      return lines.length ? lines.slice(0, 12).join("\n") : null;
+    }),
+  price: z.coerce
+    .number({ invalid_type_error: "Preço inválido." })
+    .min(0, "Preço não pode ser negativo.")
+    .max(10_000, "Preço muito alto."),
+  active: z.boolean().default(true),
+});
+export type PlanFormInput = z.input<typeof planSchema>;
+export type PlanFormOutput = z.output<typeof planSchema>;

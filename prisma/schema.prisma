@@ -25,6 +25,12 @@ enum Role {
   ADMIN
 }
 
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  CANCELLED
+}
+
 enum AppointmentStatus {
   PENDING
   CONFIRMED
@@ -48,6 +54,8 @@ model User {
   barber              Barber?
   appointments        Appointment[]        @relation("ClientAppointments")
   passwordResetTokens PasswordResetToken[]
+  subscriptions       Subscription[]
+  loyaltyRedemptions  LoyaltyRedemption[]
 
   @@index([role])
 }
@@ -144,6 +152,9 @@ model ShopSettings {
   minAdvanceMinutes       Int      @default(60)
   maxAdvanceDays          Int      @default(60)
   cancellationNoticeHours Int      @default(2)
+  /// Clube do Mandu: atendimentos concluídos necessários para 1 recompensa.
+  loyaltyGoal             Int      @default(10)
+  loyaltyReward           String   @default("1 corte grátis")
   updatedAt               DateTime @updatedAt
 }
 
@@ -158,4 +169,54 @@ model PasswordResetToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+/// Plano mensal oferecido pela barbearia (ex.: cortes ilimitados).
+model Plan {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  /// Benefícios, um por linha.
+  benefits    String?
+  priceCents  Int
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subscriptions Subscription[]
+
+  @@index([active])
+}
+
+/// Assinatura de um cliente. Sem cobrança online: o cliente solicita (PENDING)
+/// e a barbearia ativa após o pagamento presencial.
+model Subscription {
+  id          String             @id @default(cuid())
+  clientId    String
+  planId      String
+  status      SubscriptionStatus @default(PENDING)
+  /// Preço congelado no momento da solicitação.
+  priceCents  Int
+  activatedAt DateTime?
+  cancelledAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  client User @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  plan   Plan @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([clientId, status])
+  @@index([status])
+}
+
+/// Resgate de recompensa do Clube do Mandu (registrado pelo administrador).
+model LoyaltyRedemption {
+  id         String   @id @default(cuid())
+  clientId   String
+  reward     String
+  createdAt  DateTime @default(now())
+
+  client User @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
 }

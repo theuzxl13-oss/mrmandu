@@ -11,6 +11,9 @@ import { requirePageRole } from "@/server/auth/session";
 import { setClientActiveAction } from "@/server/actions/admin.actions";
 import { listBarberOptions } from "@/server/services/barber.service";
 import { getClientDetail } from "@/server/services/client.service";
+import { getLoyaltyStatus } from "@/server/services/loyalty.service";
+import { LoyaltyCard } from "@/components/client/loyalty-card";
+import { RedeemRewardButton } from "@/components/admin/subscription-actions";
 
 export const metadata = { title: "Cliente" };
 
@@ -21,7 +24,7 @@ export default async function AdminClienteDetailPage({ params }: { params: Promi
     if (isAppError(e) && e.code === "NOT_FOUND") notFound();
     throw e;
   });
-  const barbers = await listBarberOptions(user);
+  const [barbers, loyalty] = await Promise.all([listBarberOptions(user), getLoyaltyStatus(user, client.id)]);
   const count = (s: string) => client.stats.find((x) => x.status === s)?._count._all ?? 0;
   const spent = client.stats.find((x) => x.status === "COMPLETED")?._sum.priceCents ?? 0;
   const today = todayKey();
@@ -51,6 +54,13 @@ export default async function AdminClienteDetailPage({ params }: { params: Promi
         <StatCard label="Cancelados" value={count("CANCELLED")} />
         <StatCard label="Total gasto" value={formatCurrency(spent)} />
       </div>
+      <section>
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <h2 className="eyebrow">Clube do Mandu</h2>
+          <RedeemRewardButton clientId={client.id} reward={loyalty.reward} available={loyalty.available} />
+        </div>
+        <LoyaltyCard status={loyalty} compact />
+      </section>
       <section>
         <h2 className="eyebrow mb-4">Histórico de agendamentos</h2>
         {client.history.length ? (

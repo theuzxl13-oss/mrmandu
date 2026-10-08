@@ -150,6 +150,23 @@ async function main() {
     }
   }
 
+  // Planos mensais
+  const planSeeds = [
+    { name: "Plano Corte", description: "Para manter o corte sempre alinhado.", benefits: "Até 4 cortes por mês\nAgendamento prioritário", priceCents: 12900 },
+    { name: "Plano Barba", description: "Barba feita toda semana.", benefits: "Até 4 barbas por mês\nToalha quente inclusa", priceCents: 9900 },
+    { name: "Plano Completo", description: "Corte e barba ilimitados.", benefits: "Cortes e barbas ilimitados\nSobrancelha inclusa\n10% de desconto em produtos", priceCents: 19900 },
+  ];
+  const plans = [];
+  for (const p of planSeeds) {
+    const existing = await db.plan.findFirst({ where: { name: p.name } });
+    plans.push(existing ? await db.plan.update({ where: { id: existing.id }, data: p }) : await db.plan.create({ data: p }));
+  }
+  await db.subscription.deleteMany({ where: { clientId: { in: clients.map((c) => c.id) } } });
+  await db.subscription.create({
+    data: { clientId: clients[0]!.id, planId: plans[2]!.id, priceCents: plans[2]!.priceCents, status: "ACTIVE", activatedAt: new Date() },
+  });
+  await db.subscription.create({ data: { clientId: clients[1]!.id, planId: plans[0]!.id, priceCents: plans[0]!.priceCents } });
+
   const total = await db.appointment.count();
   console.info(`\nSeed concluído: ${barbers.length} barbeiros, ${services.length} serviços, ${clients.length} clientes, ${total} agendamentos.`);
   console.info(`Senha de todos os usuários de teste: ${PASSWORD}  (apenas desenvolvimento!)\n`);

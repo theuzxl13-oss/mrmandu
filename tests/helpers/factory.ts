@@ -15,7 +15,7 @@ export const SUNDAY = "2030-01-13";
 
 export async function resetDb() {
   await db.$executeRawUnsafe(
-    'TRUNCATE "Appointment", "BusinessHours", "Barber", "Service", "PasswordResetToken", "User", "ShopSettings" CASCADE',
+    'TRUNCATE "Subscription", "Plan", "LoyaltyRedemption", "Appointment", "BusinessHours", "Barber", "Service", "PasswordResetToken", "User", "ShopSettings" CASCADE',
   );
 }
 

@@ -12,7 +12,7 @@ import { maskPhone } from "@/lib/format";
 import { updateSettingsAction } from "@/server/actions/admin.actions";
 import { settingsSchema, type SettingsFormInput } from "@/validations/catalog";
 
-export function SettingsForm({ settings }: { settings: Omit<ShopSettings, "updatedAt"> }) {
+export function SettingsForm({ settings }: { settings: ShopSettings }) {
   const form = useForm<SettingsFormInput, unknown, z.output<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
@@ -28,6 +28,8 @@ export function SettingsForm({ settings }: { settings: Omit<ShopSettings, "updat
       minAdvanceMinutes: settings.minAdvanceMinutes,
       maxAdvanceDays: settings.maxAdvanceDays,
       cancellationNoticeHours: settings.cancellationNoticeHours,
+      loyaltyGoal: settings.loyaltyGoal,
+      loyaltyReward: settings.loyaltyReward,
     },
   });
   const { errors, isDirty } = form.formState;
@@ -70,6 +72,18 @@ export function SettingsForm({ settings }: { settings: Omit<ShopSettings, "updat
           </Field>
           <Field label="Prazo de cancelamento (h)" htmlFor="notice" error={errors.cancellationNoticeHours?.message} hint="Cliente só cancela/reagenda com esta antecedência.">
             <Input id="notice" type="number" min={0} {...form.register("cancellationNoticeHours")} />
+          </Field>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Clube do Mandu</CardTitle></CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-2">
+          <Field label="Atendimentos para recompensa" htmlFor="loyaltyGoal" error={errors.loyaltyGoal?.message} hint="Cada atendimento concluído vale 1 selo.">
+            <Input id="loyaltyGoal" type="number" min={1} max={100} {...form.register("loyaltyGoal")} />
+          </Field>
+          <Field label="Recompensa" htmlFor="loyaltyReward" error={errors.loyaltyReward?.message}>
+            <Input id="loyaltyReward" placeholder="1 corte grátis" {...form.register("loyaltyReward")} />
           </Field>
         </CardContent>
       </Card>

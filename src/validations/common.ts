@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { isValidDateKey, TIME_KEY_REGEX } from "@/lib/time";
 
-// eslint-disable-next-line no-control-regex
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
 /** Texto livre sanitizado: remove caracteres de controle, normaliza espaços e limita tamanho. */

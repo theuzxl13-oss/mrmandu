@@ -9,6 +9,9 @@ import {
   ClipboardList,
   Clock,
   Home,
+  House,
+  IdCard,
+  Layers,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -43,6 +46,9 @@ const ICONS = {
   plus: CalendarPlus,
   user: User,
   home: Home,
+  house: House,
+  card: IdCard,
+  layers: Layers,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;
@@ -59,6 +65,8 @@ interface AppShellProps {
   user: { name: string; email: string; roleLabel: string };
   nav: NavItem[];
   layout: "sidebar" | "top";
+  /** Legenda no rodapé da barra lateral. */
+  sidebarLabel?: string;
   children: React.ReactNode;
 }
 
@@ -66,7 +74,7 @@ function isActive(pathname: string, item: NavItem) {
   return item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
 }
 
-export function AppShell({ user, nav, layout, children }: AppShellProps) {
+export function AppShell({ user, nav, layout, sidebarLabel, children }: AppShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   useEffect(() => setMobileOpen(false), [pathname]);
@@ -165,14 +173,21 @@ export function AppShell({ user, nav, layout, children }: AppShellProps) {
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[260px_1fr]">
-      <aside className="sticky top-0 hidden h-dvh flex-col border-r bg-card/50 lg:flex">
-        <Link href={nav[0]?.href ?? "/"} className="flex h-16 items-center border-b px-6">
-          <Logo size="sm" tagline />
+      <aside className="sticky top-0 hidden h-dvh flex-col border-r lg:flex">
+        <Link href={nav[0]?.href ?? "/"} className="flex items-center justify-center px-6 pb-16 pt-10">
+          <Logo size="md" />
         </Link>
-        <nav className="flex-1 space-y-1 overflow-y-auto p-4" aria-label="Administração">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-4" aria-label="Menu do painel">
           {navLinks("sidebar")}
+          <button
+            type="button"
+            onClick={() => void logoutAction()}
+            className="flex w-full items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
+          >
+            <LogOut className="h-4 w-4" /> Sair
+          </button>
         </nav>
-        <p className="border-t px-6 py-4 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Painel administrativo</p>
+        {sidebarLabel && <p className="px-6 py-6 text-caption uppercase text-muted-foreground">{sidebarLabel}</p>}
       </aside>
       <div className="min-w-0">
         {header}

@@ -6,6 +6,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <AppShell
       layout="sidebar"
+      sidebarLabel="Painel administrativo"
       user={{ name: user.name, email: user.email, roleLabel: "Administrador" }}
       nav={[
         { href: "/admin", label: "Dashboard", icon: "dashboard", exact: true },
@@ -14,6 +15,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         { href: "/admin/clientes", label: "Clientes", icon: "users" },
         { href: "/admin/barbeiros", label: "Barbeiros", icon: "user" },
         { href: "/admin/servicos", label: "Serviços", icon: "scissors" },
+        { href: "/admin/planos", label: "Planos & Clube", icon: "layers" },
         { href: "/admin/horarios", label: "Horários", icon: "clock" },
         { href: "/admin/configuracoes", label: "Configurações", icon: "settings" },
       ]}

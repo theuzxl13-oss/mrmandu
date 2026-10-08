@@ -7,7 +7,7 @@ export const metadata = { title: "Configurações" };
 
 export default async function AdminConfiguracoesPage() {
   await requirePageRole("ADMIN");
-  const { updatedAt: _updatedAt, ...settings } = await getShopSettings();
+  const settings = await getShopSettings();
   return (
     <div className="max-w-4xl">
       <PageHeader title="Configurações" description="Dados da barbearia e regras de funcionamento do agendamento." />
