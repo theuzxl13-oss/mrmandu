@@ -1,5 +1,11 @@
 import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
+
+// Registra os tamanhos de fonte customizados para que o merge não os
+// confunda com cores de texto (ex.: "text-caption" x "text-primary-foreground").
+const twMerge = extendTailwindMerge({
+  extend: { classGroups: { "font-size": [{ text: ["caption", "display", "heading", "archive"] }] } },
+});
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

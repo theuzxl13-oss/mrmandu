@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Onyx #0e0e0e · Paper White #fefefe · Faint #2a2a2a — sistema acromático */
+    --background: 0 0% 5.5%;
+    --foreground: 0 0% 99.6%;
+    --card: 0 0% 5.5%;
+    --card-foreground: 0 0% 99.6%;
+    --primary: 0 0% 99.6%;
+    --primary-foreground: 0 0% 5.5%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 99.6%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 99.6%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 60% 45%;
+    --warning: 38 92% 55%;
+    --border: 0 0% 16.5%;
+    --input: 0 0% 22%;
+    --ring: 0 0% 99.6%;
+    --radius: 0;
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  ::selection {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer components {
+  /* Rótulo de galeria: 12px, caixa-alta, informativo */
+  .eyebrow {
+    @apply text-caption font-normal uppercase tracking-[0.04em] text-muted-foreground;
+  }
+  /* Títulos: peso 400, entrelinha apertada — tipografia como arquitetura */
+  .heading-display {
+    @apply font-normal uppercase leading-[0.9] tracking-[-0.02em];
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

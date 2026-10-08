@@ -24,7 +24,8 @@ export function formatDateKey(date: DateKey): string {
 
 /** "quinta-feira, 15 de outubro" */
 export function formatDateLong(date: DateKey): string {
-  return formatInTimeZone(new Date(`${date}T12:00:00Z`), "UTC", "EEEE, d 'de' MMMM", { locale: ptBR });
+  const text = formatInTimeZone(new Date(`${date}T12:00:00Z`), "UTC", "EEEE, d 'de' MMMM", { locale: ptBR });
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 /** "qui, 15 out" */
@@ -42,4 +43,13 @@ export function formatPhone(phone: string | null | undefined): string {
   if (digits.length === 11) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   if (digits.length === 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
   return phone;
+}
+
+/** Máscara progressiva para campos de telefone: (11) 98888-7777 */
+export function maskPhone(value: string): string {
+  const d = value.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 2) return d.length ? `(${d}` : "";
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 }

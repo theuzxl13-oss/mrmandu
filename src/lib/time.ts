@@ -78,3 +78,8 @@ export function shopDayRangeUtc(date: DateKey, tz = SHOP_TIMEZONE): { start: Dat
     end: shopDateTimeToUtc(addDaysToKey(date, 1), "00:00", tz),
   };
 }
+
+/** Lê uma data da querystring, com fallback seguro. */
+export function parseDateParam(value: string | string[] | undefined, fallback: DateKey): DateKey {
+  return typeof value === "string" && isValidDateKey(value) ? value : fallback;
+}
