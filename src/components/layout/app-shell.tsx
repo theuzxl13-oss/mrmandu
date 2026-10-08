@@ -59,6 +59,8 @@ export interface NavItem {
   icon: IconName;
   /** Ativo somente na rota exata (ex.: raiz do painel). */
   exact?: boolean;
+  /** Subitens (ex.: agenda de cada barbeiro). */
+  children?: { href: string; label: string }[];
 }
 
 interface AppShellProps {
@@ -83,20 +85,42 @@ export function AppShell({ user, nav, layout, sidebarLabel, children }: AppShell
     nav.map((item) => {
       const Icon = ICONS[item.icon];
       const active = isActive(pathname, item);
+      const exactActive = pathname === item.href;
       return (
-        <Link
-          key={item.href}
-          href={item.href}
-          aria-current={active ? "page" : undefined}
-          className={cn(
-            "flex items-center gap-3 rounded-md text-sm transition-colors",
-            variant === "top" ? "px-3 py-2" : "px-3 py-2.5",
-            active ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+        <div key={item.href}>
+          <Link
+            href={item.href}
+            aria-current={(item.children ? exactActive : active) ? "page" : undefined}
+            className={cn(
+              "flex items-center gap-3 text-sm transition-colors",
+              variant === "top" ? "px-3 py-2" : "px-3 py-2.5",
+              (item.children ? exactActive : active) ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+            )}
+          >
+            <Icon className="h-4 w-4 shrink-0" />
+            {item.label}
+          </Link>
+          {variant !== "top" && item.children && item.children.length > 0 && (
+            <div className="mb-1 ml-5 border-l pl-3">
+              {item.children.map((child) => {
+                const childActive = pathname === child.href || pathname.startsWith(`${child.href}/`);
+                return (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    aria-current={childActive ? "page" : undefined}
+                    className={cn(
+                      "block px-3 py-1.5 text-[13px] transition-colors",
+                      childActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {child.label}
+                  </Link>
+                );
+              })}
+            </div>
           )}
-        >
-          <Icon className="h-4 w-4 shrink-0" />
-          {item.label}
-        </Link>
+        </div>
       );
     });
 

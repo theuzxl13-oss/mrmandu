@@ -1,5 +1,5 @@
 import { AppError } from "@/lib/errors";
-import { dayOfWeekOf, minutesToTime, timeToMinutes, type DateKey, type TimeKey } from "@/lib/time";
+import { addDaysToKey, dayOfWeekOf, minutesToTime, shopDayRangeUtc, timeToMinutes, type DateKey, type TimeKey } from "@/lib/time";
 import { db } from "@/server/db";
 import { assertRole } from "@/server/auth/permissions";
 import { workingIntervals, type Interval } from "@/server/scheduling/slots";
@@ -65,4 +65,25 @@ export async function getDaySchedules(actor: SessionUser, date: DateKey, barberI
       cancelled: own.filter((a) => a.status === "CANCELLED"),
     };
   });
+}
+
+export interface DaySummary {
+  date: DateKey;
+  count: number;
+}
+
+/** Quantidade de atendimentos (não cancelados) por dia em uma janela, para um barbeiro. */
+export async function getWeekSummary(actor: SessionUser, barberId: string, startDate: DateKey, days = 7): Promise<DaySummary[]> {
+  assertRole(actor, "BARBER", "ADMIN");
+  if (actor.role === "BARBER" && barberId !== actor.barberId) throw new AppError("FORBIDDEN");
+  const keys = Array.from({ length: days }, (_, i) => addDaysToKey(startDate, i));
+  const rows = await db.appointment.findMany({
+    where: {
+      barberId,
+      status: { not: "CANCELLED" },
+      startTime: { gte: shopDayRangeUtc(keys[0]!).start, lt: shopDayRangeUtc(keys[keys.length - 1]!).end },
+    },
+    select: { date: true },
+  });
+  return keys.map((date) => ({ date, count: rows.filter((r) => r.date.toISOString().slice(0, 10) === date).length }));
 }

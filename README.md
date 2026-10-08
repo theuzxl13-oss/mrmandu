@@ -4,6 +4,33 @@ Plataforma de agendamento para barbearia, com três perfis de acesso (**Cliente*
 
 > Não é um mockup: frontend, backend, banco de dados, autenticação, autorização e regras de agenda são funcionais e cobertos por testes de integração contra PostgreSQL.
 
+![Home — mr.mandu](docs/screenshots/home-desktop.png)
+
+## Visão geral (apresentação)
+
+**O problema:** agenda em papel/WhatsApp gera conflito de horário, falta de controle e cliente esperando resposta.
+**A solução:** o cliente agenda sozinho, 24h, escolhendo **serviço, barbeiro, dia e horário** — e o sistema garante que **nunca** haverá dois clientes no mesmo horário com o mesmo barbeiro.
+
+| | |
+|---|---|
+| **Cliente escolhe o barbeiro** (Victor, Mandu, Joãozinho, Gonça, Ramon) ou "qualquer disponível" | **Só aparecem horários livres** — ocupados ficam riscados |
+| ![Escolha do barbeiro](docs/screenshots/agendar-barbeiro.png) | ![Escolha do horário](docs/screenshots/agendar-horario.png) |
+| **Agenda de cada barbeiro** — semana + linha do tempo do dia | **Dashboard do dono** — agendamentos, clientes, faturamento |
+| ![Agenda do barbeiro](docs/screenshots/agenda-victor.png) | ![Dashboard administrativo](docs/screenshots/admin.png) |
+| **Área do cliente** — próximo horário, Clube e Plano | **Clube do Mandu** — fidelidade com selos |
+| ![Área do cliente](docs/screenshots/c-inicio.png) | ![Clube do Mandu](docs/screenshots/c-clube.png) |
+| **Planos mensais** — receita recorrente | **Gestão de planos e assinaturas** |
+| ![Planos](docs/screenshots/c-plano.png) | ![Admin planos](docs/screenshots/a-planos.png) |
+
+<p align="center"><img src="docs/screenshots/home-mobile.png" width="280" alt="Versão mobile" /><br/><em>100% responsivo — pensado primeiro para o celular.</em></p>
+
+**Por que isso importa para o negócio**
+- **Menos tempo no WhatsApp**: o cliente agenda, cancela e reagenda sozinho, dentro das regras da casa (antecedência, prazo de cancelamento).
+- **Zero conflito de horário**: regra garantida no banco de dados, mesmo com dois clientes clicando ao mesmo tempo.
+- **Cada barbeiro com sua agenda**: cada um entra com seu login e vê só os próprios atendimentos; o dono vê tudo.
+- **Fidelização e receita recorrente**: Clube do Mandu (a cada 10 cortes, 1 grátis) e Planos mensais.
+- **Números na mão**: faturamento do mês, atendimentos, pendências e gráfico dos últimos 7 dias.
+
 ---
 
 ## Sumário
@@ -43,7 +70,8 @@ Plataforma de agendamento para barbearia, com três perfis de acesso (**Cliente*
 
 **Administrador** (`/admin`)
 - Dashboard: agendamentos hoje, clientes, concluídos e faturamento do mês, pendentes, gráficos de 7 dias, agenda do dia.
-- Agenda diária de todos os barbeiros; agendamentos com filtros (data, barbeiro, serviço, status) e busca por cliente; criar (em nome do cliente), editar observações, confirmar, reagendar (inclusive trocando o barbeiro), concluir, cancelar.
+- **Agenda de cada barbeiro** (Victor, Mandu, Joãozinho, Gonça, Ramon) em seção própria no menu: faixa da semana com total por dia + linha do tempo do dia; e agenda geral com todos lado a lado.
+- Agendamentos com filtros (data, barbeiro, serviço, status) e busca por cliente; criar (em nome do cliente), editar observações, confirmar, reagendar (inclusive trocando o barbeiro), concluir, cancelar.
 - Clientes (tabela, detalhes, histórico, ativar/desativar, resgates do Clube).
 - Barbeiros (criar, editar, foto, especialidade, ativar/desativar, jornada própria).
 - Serviços (criar, editar, excluir, ativar/desativar).
@@ -184,8 +212,11 @@ Criados pelo `npm run db:seed`. **Senha de todos: `Mandu@2026`** (ou o valor de 
 | Perfil | E-mail | Acesso |
 |---|---|---|
 | Administrador | `admin@mrmandu.com` | Entrar → *Barbeiro / Admin* |
-| Barbeiro | `joao@mrmandu.com` | Entrar → *Barbeiro / Admin* |
-| Barbeiro | `pedro@mrmandu.com` | Entrar → *Barbeiro / Admin* |
+| Barbeiro — Victor | `victor@mrmandu.com` | Entrar → *Barbeiro / Admin* |
+| Barbeiro — Mandu | `mandu@mrmandu.com` | Entrar → *Barbeiro / Admin* |
+| Barbeiro — Joãozinho | `joaozinho@mrmandu.com` | Entrar → *Barbeiro / Admin* |
+| Barbeiro — Gonça | `gonca@mrmandu.com` | Entrar → *Barbeiro / Admin* |
+| Barbeiro — Ramon | `ramon@mrmandu.com` | Entrar → *Barbeiro / Admin* |
 | Cliente | `carlos@cliente.com` (plano ativo) | Entrar → *Cliente* |
 | Cliente | `rafael@cliente.com` (plano pendente) | Entrar → *Cliente* |
 | Cliente | `lucas@cliente.com`, `marcos@cliente.com` | Entrar → *Cliente* |

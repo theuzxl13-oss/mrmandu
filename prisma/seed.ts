@@ -72,10 +72,20 @@ async function main() {
 
   await upsertUser({ name: "Administrador Mandu", email: "admin@mrmandu.com", phone: "11900000000", role: "ADMIN" }, passwordHash);
 
+  // Equipe da barbearia
   const barberSeeds = [
-    { name: "João Mandu", email: "joao@mrmandu.com", phone: "11911111111", specialty: "Cortes clássicos e navalha", bio: "Mais de 10 anos de experiência em cortes clássicos, degradê e barboterapia." },
-    { name: "Pedro Alves", email: "pedro@mrmandu.com", phone: "11922222222", specialty: "Degradê e barba", bio: "Especialista em degradê, desenhos e design de barba." },
+    { name: "Victor", email: "victor@mrmandu.com", phone: "11911111111", specialty: "Degradê e navalha", bio: "Especialista em degradê, acabamento na navalha e cortes modernos." },
+    { name: "Mandu", email: "mandu@mrmandu.com", phone: "11922222222", specialty: "Cortes clássicos", bio: "Fundador da casa. Tesoura, pente e a tradição da barbearia clássica." },
+    { name: "Joãozinho", email: "joaozinho@mrmandu.com", phone: "11933334444", specialty: "Barba e barboterapia", bio: "Design de barba, toalha quente e barboterapia completa." },
+    { name: "Gonça", email: "gonca@mrmandu.com", phone: "11944445555", specialty: "Cortes texturizados", bio: "Texturizados, cachos e cortes com volume." },
+    { name: "Ramon", email: "ramon@mrmandu.com", phone: "11955556666", specialty: "Desenhos e freestyle", bio: "Desenhos, risquinhos e cortes freestyle." },
   ];
+  // Remove barbeiros de versões antigas do seed (sem agendamentos reais).
+  const legacy = await db.user.findMany({ where: { email: { in: ["joao@mrmandu.com", "pedro@mrmandu.com"] } }, select: { id: true, barber: { select: { id: true } } } });
+  for (const u of legacy) {
+    if (u.barber) await db.appointment.deleteMany({ where: { barberId: u.barber.id } });
+    await db.user.delete({ where: { id: u.id } });
+  }
   const barbers = [];
   for (const b of barberSeeds) {
     const user = await upsertUser({ name: b.name, email: b.email, phone: b.phone, role: "BARBER" }, passwordHash);
@@ -113,10 +123,11 @@ async function main() {
   const times = ["09:00", "10:00", "11:00", "14:00", "15:30", "17:00"];
   let n = 0;
   for (let offset = -14; offset <= 7; offset++) {
+    // 5 barbeiros: 2 atendimentos por barbeiro/dia para manter a agenda realista
     const date = addDaysToKey(today, offset);
     if (dayOfWeekOf(date) === 0) continue;
     for (const [bi, barber] of barbers.entries()) {
-      for (let slot = 0; slot < 3; slot++) {
+      for (let slot = 0; slot < 2; slot++) {
         n++;
         const time = times[(slot * 2 + bi + Math.abs(offset)) % times.length]!;
         const service = services[n % services.length]!;

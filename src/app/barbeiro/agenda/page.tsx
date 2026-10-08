@@ -1,9 +1,10 @@
 import { DateNav } from "@/components/appointments/date-nav";
 import { DayTimeline } from "@/components/appointments/day-timeline";
+import { WeekStrip } from "@/components/appointments/week-strip";
 import { PageHeader } from "@/components/ui/misc";
-import { parseDateParam, todayKey } from "@/lib/time";
+import { addDaysToKey, dayOfWeekOf, parseDateParam, todayKey } from "@/lib/time";
 import { requirePageRole } from "@/server/auth/session";
-import { getDaySchedules } from "@/server/services/schedule.service";
+import { getDaySchedules, getWeekSummary } from "@/server/services/schedule.service";
 
 export const metadata = { title: "Agenda" };
 
@@ -11,10 +12,14 @@ export default async function BarbeiroAgendaPage({ searchParams }: { searchParam
   const user = await requirePageRole("BARBER");
   const today = todayKey();
   const date = parseDateParam((await searchParams).data, today);
-  const [schedule] = await getDaySchedules(user, date);
+  const weekStart = addDaysToKey(date, -((dayOfWeekOf(date) + 6) % 7));
+  const [[schedule], week] = await Promise.all([getDaySchedules(user, date), getWeekSummary(user, user.barberId ?? "", weekStart)]);
   return (
     <div>
       <PageHeader title="Minha agenda" />
+      <div className="mb-4">
+        <WeekStrip days={week} selected={date} hrefFor={(d) => `/barbeiro/agenda?data=${d}`} />
+      </div>
       <div className="mb-6">
         <DateNav date={date} today={today} basePath="/barbeiro/agenda" />
       </div>

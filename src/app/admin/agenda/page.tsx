@@ -37,7 +37,12 @@ export default async function AdminAgendaPage({ searchParams }: { searchParams: 
       {schedules.length ? (
         <div className="grid gap-4 xl:grid-cols-2">
           {schedules.map((s) => (
-            <DayTimeline key={s.barberId} schedule={s} role="ADMIN" today={today} barbers={barbers} title={s.barberName} />
+            <div key={s.barberId}>
+              <DayTimeline schedule={s} role="ADMIN" today={today} barbers={barbers} title={s.barberName} />
+              <a href={`/admin/agenda/${s.barberId}?data=${date}`} className="mt-2 inline-block text-caption font-bold uppercase hover:underline">
+                Agenda completa de {s.barberName} →
+              </a>
+            </div>
           ))}
         </div>
       ) : (
