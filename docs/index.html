@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mr.mandu — Apresentação do projeto</title>
+  <meta name="description" content="Plataforma de agendamento da MR.MANDU BARBERS — apresentação do projeto." />
+  <meta name="theme-color" content="#0e0e0e" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display&family=Quicksand:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --onyx: #0e0e0e;
+      --paper: #fefefe;
+      --faint: #2a2a2a;
+      --muted: #999;
+      --gutter: 16px;
+    }
+    @media (min-width: 640px) { :root { --gutter: 32px; } }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--onyx);
+      color: var(--paper);
+      font-family: Inter, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* O título monumental "sangra" pelas bordas sem gerar rolagem horizontal */
+    main, footer { overflow-x: clip; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    .caption { font-size: 12px; line-height: 1.5; text-transform: uppercase; letter-spacing: .04em; }
+    .muted { color: var(--muted); }
+    .logo { font-family: Quicksand, sans-serif; letter-spacing: -.03em; line-height: 1; }
+    .logo b { font-weight: 700; }
+    .logo span { font-weight: 400; }
+    .serif { font-family: "Playfair Display", Georgia, serif; font-weight: 400; }
+    .wrap { padding: 0 var(--gutter); }
+
+    /* Navegação */
+    header {
+      position: sticky; top: 0; z-index: 10; background: var(--onyx);
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; padding: 0 var(--gutter);
+    }
+    header nav { display: none; gap: 32px; }
+    header nav a { opacity: .7; transition: opacity .2s; }
+    header nav a:hover { opacity: 1; }
+    @media (min-width: 900px) { header nav { display: flex; } }
+    .cta { font-weight: 700; }
+    .cta:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+    /* Hero monumental */
+    .hero { min-height: calc(100svh - 64px); display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 40px; }
+    .display {
+      font-weight: 400; text-transform: uppercase; letter-spacing: -.02em;
+      font-size: clamp(4rem, 15.5vw, 13.5rem); line-height: .8; white-space: nowrap;
+    }
+    .display .l2 { transform: translateX(-2%); }
+    .hero-meta { display: grid; gap: 24px; margin-top: 48px; }
+    @media (min-width: 900px) { .hero-meta { grid-template-columns: repeat(3, 1fr); align-items: end; } }
+    .lead { font-size: 18px; line-height: 1.33; max-width: 30em; opacity: .85; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      height: 52px; padding: 0 28px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+      background: var(--paper); color: var(--onyx); transition: opacity .2s;
+    }
+    .btn:hover { opacity: .85; }
+    .btn.ghost { background: transparent; color: var(--paper); border: 1px solid rgba(254,254,254,.3); }
+    .btn.ghost:hover { border-color: var(--paper); opacity: 1; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    @media (min-width: 900px) { .actions { justify-content: flex-end; } }
+
+    /* Seções */
+    section { padding: 112px var(--gutter) 0; }
+    .head { display: grid; grid-template-columns: 2fr 6fr 4fr; gap: 16px; margin-bottom: 56px; }
+    .head h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .head .note { text-align: right; }
+    .heading { font-size: clamp(2.5rem, 6vw, 3.625rem); line-height: 1; font-weight: 400; text-transform: uppercase; letter-spacing: -.02em; }
+
+    .grid3 { display: grid; gap: 40px; }
+    @media (min-width: 800px) { .grid3 { grid-template-columns: repeat(3, 1fr); } }
+    .grid4 { display: grid; gap: 40px; }
+    @media (min-width: 640px) { .grid4 { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1100px) { .grid4 { grid-template-columns: repeat(4, 1fr); } }
+    .item h3 { font-size: 20px; line-height: 1.1; font-weight: 400; margin-top: 12px; }
+    .item p { font-size: 14px; line-height: 1.4; opacity: .7; margin-top: 12px; }
+
+    /* Tour por perfil */
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
+    .tab {
+      border: 1px solid var(--faint); background: none; color: var(--muted); cursor: pointer;
+      padding: 10px 16px; font: inherit; font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .tab[aria-selected="true"] { background: var(--paper); color: var(--onyx); border-color: var(--paper); }
+    .panel[hidden] { display: none; }
+    .screen { display: grid; gap: 24px; margin-bottom: 96px; }
+    @media (min-width: 1000px) { .screen { grid-template-columns: 4fr 8fr; gap: 48px; align-items: start; } }
+    .screen h3 { font-size: clamp(2.25rem, 5vw, 4.5rem); line-height: .9; }
+    .screen p { margin-top: 16px; font-size: 16px; line-height: 1.45; opacity: .8; max-width: 28em; }
+    .screen ul { margin-top: 20px; list-style: none; display: grid; gap: 8px; font-size: 14px; opacity: .8; }
+    .screen li::before { content: "— "; opacity: .5; }
+    .frame { border: 1px solid var(--faint); cursor: zoom-in; overflow: hidden; }
+    .frame .bar { height: 28px; border-bottom: 1px solid var(--faint); display: flex; align-items: center; gap: 6px; padding: 0 12px; }
+    .frame .bar i { width: 8px; height: 8px; background: var(--faint); display: block; }
+    .frame .bar em { margin-left: 12px; font-style: normal; font-size: 11px; color: var(--muted); }
+    .frame img { width: 100%; transition: opacity .2s; }
+    .frame:hover img { opacity: .9; }
+
+    /* Equipe */
+    .team { list-style: none; display: flex; flex-direction: column; gap: 24px; }
+    .team li { display: grid; gap: 4px 32px; align-items: end; }
+    @media (min-width: 800px) { .team li { grid-template-columns: 6fr 1fr 5fr; } }
+    .team .serif { font-size: clamp(2.5rem, 7vw, 5rem); line-height: .9; }
+
+    /* Mobile */
+    .phones { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    @media (min-width: 900px) { .phones { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
+    .phones figure { border: 1px solid var(--faint); cursor: zoom-in; }
+    .phones figcaption { padding: 12px; border-top: 1px solid var(--faint); }
+
+    /* Números */
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 16px; }
+    @media (min-width: 900px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+    .stats b { display: block; font-weight: 400; font-size: clamp(3rem, 7vw, 5.5rem); line-height: .9; letter-spacing: -.03em; }
+
+    footer { padding: 128px var(--gutter) 32px; }
+    .end { font-size: clamp(4rem, 15.5vw, 13.5rem); }
+
+    /* Visualização ampliada */
+    dialog { border: 0; padding: 0; background: transparent; max-width: 96vw; max-height: 94vh; margin: auto; }
+    dialog::backdrop { background: rgba(0,0,0,.92); }
+    dialog img { max-width: 96vw; max-height: 90vh; width: auto; border: 1px solid var(--faint); }
+    dialog p { padding-top: 10px; text-align: center; color: var(--muted); }
+
+    .fade { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
+    .fade.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .fade { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="#topo" class="logo" style="font-size:22px" aria-label="mr.mandu"><span>mr.</span><b>mandu</b></a>
+    <nav class="caption" aria-label="Seções">
+      <a href="#visao">Visão geral</a>
+      <a href="#tour">Telas</a>
+      <a href="#equipe">Equipe</a>
+      <a href="#mobile">Mobile</a>
+      <a href="#negocio">Negócio</a>
+    </nav>
+    <a class="caption cta" href="https://github.com/theuzxl13-oss/mrmandu/tree/claude/nifty-cerf-87tt09" target="_blank" rel="noopener">GitHub ↗</a>
+  </header>
+
+  <main id="topo">
+    <!-- HERO -->
+    <div class="hero">
+      <h1 class="display">
+        <span style="display:block;padding-left:var(--gutter)">Seu estilo.</span>
+        <span class="l2" style="display:block">Nosso trabalho.</span>
+      </h1>
+      <div class="hero-meta wrap">
+        <p class="caption">Apresentação do projeto<br />Plataforma de agendamento · MR.MANDU BARBERS</p>
+        <p class="lead">O cliente agenda sozinho, 24 horas por dia, escolhendo serviço, barbeiro, dia e horário. A barbearia acompanha tudo em um painel.</p>
+        <div class="actions">
+          <a class="btn" href="#tour">Ver as telas →</a>
+          <a class="btn ghost" href="#negocio">Por que isso importa</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISÃO GERAL -->
+    <section id="visao" class="fade">
+      <div class="head caption"><span class="muted">01</span><h2>Visão geral</h2><span class="note muted">Problema → solução</span></div>
+      <p class="heading" style="max-width:18ch">Agenda organizada. Cliente atendido na hora.</p>
+      <div class="grid3" style="margin-top:72px">
+        <div class="item">
+          <p class="caption muted">O problema</p>
+          <h3>Agenda no WhatsApp e no papel</h3>
+          <p>Conversas para marcar cada horário, conflitos entre barbeiros, cliente esperando resposta e nenhum controle de faturamento.</p>
+        </div>
+        <div class="item">
+          <p class="caption muted">A solução</p>
+          <h3>Agendamento online em 5 passos</h3>
+          <p>Serviço → barbeiro → data → horário → confirmação. Só aparecem horários realmente livres, dentro do funcionamento da casa.</p>
+        </div>
+        <div class="item">
+          <p class="caption muted">A garantia</p>
+          <h3>Zero conflito de horário</h3>
+          <p>Mesmo que dois clientes cliquem no mesmo horário ao mesmo tempo, só um consegue — a regra é protegida no próprio banco de dados.</p>
+        </div>
+      </div>
+      <figure class="frame" style="margin-top:72px" data-zoom>
+        <div class="bar"><i></i><i></i><i></i><em>mrmandu.com.br</em></div>
+        <img src="screenshots/home-desktop.png" alt="Página inicial da MR.MANDU BARBERS" loading="lazy" />
+      </figure>
+    </section>
+
+    <!-- TOUR POR PERFIL -->
+    <section id="tour" class="fade">
+      <div class="head caption"><span class="muted">02</span><h2>As telas</h2><span class="note muted">Três perfis de acesso</span></div>
+      <div class="tabs" role="tablist" aria-label="Perfis">
+        <button class="tab" role="tab" aria-selected="true" aria-controls="p-cliente" id="t-cliente">Cliente</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-barbeiro" id="t-barbeiro">Barbeiro</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="p-admin" id="t-admin">Administrador</button>
+      </div>
+
+      <div class="panel" id="p-cliente" role="tabpanel" aria-labelledby="t-cliente">
+        <div class="screen">
+          <div>
+            <p class="caption muted">Agendamento · etapa 2</p>
+            <h3 class="serif">Escolha o barbeiro</h3>
+            <p>O cliente escolhe com quem quer ser atendido — Victor, Mandu, Joãozinho, Gonça ou Ramon — ou deixa o sistema escolher o primeiro disponível.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/cliente/agendar</em></div><img src="screenshots/agendar-barbeiro.png" alt="Escolha do barbeiro" loading="lazy" /></figure>
+        </div>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Agendamento · etapa 4</p>
+            <h3 class="serif">Só horários livres</h3>
+            <p>Horários ocupados aparecem riscados e não podem ser escolhidos. Intervalo de almoço, dias fechados e horários que já passaram ficam de fora automaticamente.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/cliente/agendar</em></div><img src="screenshots/agendar-horario.png" alt="Escolha do horário" loading="lazy" /></figure>
+        </div>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Área do cliente</p>
+            <h3 class="serif">Tudo em um lugar</h3>
+            <p>Próximo horário em destaque, com detalhes, reagendar e cancelar (respeitando o prazo da casa). Histórico de próximos, concluídos e cancelados.</p>
+            <ul><li>Início</li><li>Agendamentos</li><li>Clube do Mandu</li><li>Plano</li><li>Perfil</li></ul>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/cliente</em></div><img src="screenshots/c-inicio.png" alt="Área do cliente" loading="lazy" /></figure>
+        </div>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Fidelidade</p>
+            <h3 class="serif">Clube do Mandu</h3>
+            <p>Cada atendimento concluído vale um selo. A cada 10 selos, um corte grátis. A regra é configurável pela barbearia.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/cliente/clube</em></div><img src="screenshots/c-clube.png" alt="Clube do Mandu" loading="lazy" /></figure>
+        </div>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Receita recorrente</p>
+            <h3 class="serif">Planos mensais</h3>
+            <p>O cliente escolhe um plano e a barbearia ativa após o pagamento. Planos e valores são definidos pelo dono.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/cliente/plano</em></div><img src="screenshots/c-plano.png" alt="Planos mensais" loading="lazy" /></figure>
+        </div>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Acesso</p>
+            <h3 class="serif">Entrar como</h3>
+            <p>Login separado para clientes e para a equipe. Cada perfil só enxerga o que lhe pertence.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/entrar</em></div><img src="screenshots/entrar.png" alt="Tela de login" loading="lazy" /></figure>
+        </div>
+      </div>
+
+      <div class="panel" id="p-barbeiro" role="tabpanel" aria-labelledby="t-barbeiro" hidden>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Painel do barbeiro</p>
+            <h3 class="serif">O dia de trabalho</h3>
+            <p>Cada barbeiro entra com o próprio login e vê apenas a sua agenda: atendimentos de hoje, próximo cliente, pendências e a linha do tempo do dia.</p>
+            <ul><li>Confirmar</li><li>Reagendar</li><li>Concluir</li><li>Cancelar</li><li>Anotar observações</li></ul>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/barbeiro</em></div><img src="screenshots/barbeiro.png" alt="Painel do barbeiro" loading="lazy" /></figure>
+        </div>
+      </div>
+
+      <div class="panel" id="p-admin" role="tabpanel" aria-labelledby="t-admin" hidden>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Dashboard</p>
+            <h3 class="serif">Os números da casa</h3>
+            <p>Agendamentos de hoje, clientes, atendimentos e faturamento do mês, pendências e gráficos dos últimos 7 dias.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/admin</em></div><img src="screenshots/admin.png" alt="Dashboard administrativo" loading="lazy" /></figure>
+        </div>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Agenda por barbeiro</p>
+            <h3 class="serif">Uma agenda para cada um</h3>
+            <p>No menu, cada barbeiro tem a sua seção: a semana com o total de atendimentos por dia e a linha do tempo com horários livres e ocupados.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/admin/agenda/victor</em></div><img src="screenshots/agenda-victor.png" alt="Agenda do barbeiro Victor" loading="lazy" /></figure>
+        </div>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Agenda geral</p>
+            <h3 class="serif">Toda a equipe lado a lado</h3>
+            <p>Visão diária de todos os barbeiros, com navegação por data e ações em cada atendimento.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/admin/agenda</em></div><img src="screenshots/admin-agenda.png" alt="Agenda geral" loading="lazy" /></figure>
+        </div>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Clientes</p>
+            <h3 class="serif">Quem é cliente da casa</h3>
+            <p>Lista com telefone, e-mail, número de agendamentos e último atendimento. Cada cliente tem página com histórico e selos do Clube.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/admin/clientes</em></div><img src="screenshots/admin-cli.png" alt="Clientes" loading="lazy" /></figure>
+        </div>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Funcionamento</p>
+            <h3 class="serif">Horários da casa</h3>
+            <p>Abertura, fechamento e intervalo por dia da semana, e jornada própria de cada barbeiro. Nenhum agendamento é aceito fora desses horários.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/admin/horarios</em></div><img src="screenshots/admin-hor.png" alt="Horários de funcionamento" loading="lazy" /></figure>
+        </div>
+        <div class="screen">
+          <div>
+            <p class="caption muted">Planos & Clube</p>
+            <h3 class="serif">Assinaturas</h3>
+            <p>Criação de planos, ativação de assinaturas e receita recorrente mensal em um só lugar.</p>
+          </div>
+          <figure class="frame" data-zoom><div class="bar"><i></i><i></i><i></i><em>/admin/planos</em></div><img src="screenshots/a-planos.png" alt="Planos e assinaturas" loading="lazy" /></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- EQUIPE -->
+    <section id="equipe" class="fade">
+      <div class="head caption"><span class="muted">03</span><h2>Equipe</h2><span class="note muted">5 barbeiros · 5 agendas</span></div>
+      <ul class="team">
+        <li><span class="serif">Victor</span><span class="caption muted">01</span><span class="caption">Degradê e navalha</span></li>
+        <li><span class="serif">Mandu</span><span class="caption muted">02</span><span class="caption">Cortes clássicos</span></li>
+        <li><span class="serif">Joãozinho</span><span class="caption muted">03</span><span class="caption">Barba e barboterapia</span></li>
+        <li><span class="serif">Gonça</span><span class="caption muted">04</span><span class="caption">Cortes texturizados</span></li>
+        <li><span class="serif">Ramon</span><span class="caption muted">05</span><span class="caption">Desenhos e freestyle</span></li>
+      </ul>
+    </section>
+
+    <!-- MOBILE -->
+    <section id="mobile" class="fade">
+      <div class="head caption"><span class="muted">04</span><h2>Mobile</h2><span class="note muted">Pensado primeiro para o celular</span></div>
+      <div class="phones">
+        <figure data-zoom><img src="screenshots/home-mobile.png" alt="Home no celular" loading="lazy" /><figcaption class="caption">Home</figcaption></figure>
+        <figure data-zoom><img src="screenshots/m-horario.png" alt="Escolha de horário no celular" loading="lazy" /><figcaption class="caption">Escolha do horário</figcaption></figure>
+        <figure data-zoom><img src="screenshots/m-cliente.png" alt="Área do cliente no celular" loading="lazy" /><figcaption class="caption">Área do cliente</figcaption></figure>
+        <figure data-zoom><img src="screenshots/m-barbeiro.png" alt="Painel do barbeiro no celular" loading="lazy" /><figcaption class="caption">Painel do barbeiro</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- NEGÓCIO -->
+    <section id="negocio" class="fade">
+      <div class="head caption"><span class="muted">05</span><h2>Para o negócio</h2><span class="note muted">O que muda na prática</span></div>
+      <div class="stats">
+        <div><b>24h</b><p class="caption muted" style="margin-top:12px">Agendamento online, sem depender de alguém responder</p></div>
+        <div><b>0</b><p class="caption muted" style="margin-top:12px">Conflitos de horário — garantido no banco de dados</p></div>
+        <div><b>5</b><p class="caption muted" style="margin-top:12px">Barbeiros, cada um com login e agenda próprios</p></div>
+        <div><b>3</b><p class="caption muted" style="margin-top:12px">Perfis de acesso: cliente, barbeiro e administrador</p></div>
+      </div>
+      <div class="grid4" style="margin-top:96px">
+        <div class="item"><p class="caption muted">01</p><h3>Menos tempo no WhatsApp</h3><p>Cliente agenda, cancela e reagenda sozinho, dentro das regras da casa (antecedência e prazo de cancelamento).</p></div>
+        <div class="item"><p class="caption muted">02</p><h3>Fidelização</h3><p>O Clube do Mandu recompensa quem volta: a cada 10 atendimentos, um corte grátis.</p></div>
+        <div class="item"><p class="caption muted">03</p><h3>Receita recorrente</h3><p>Planos mensais trazem previsibilidade de caixa todo mês.</p></div>
+        <div class="item"><p class="caption muted">04</p><h3>Controle total</h3><p>Faturamento, atendimentos, clientes e pendências sempre à mão, com segurança e acesso por perfil.</p></div>
+      </div>
+      <div class="grid3" style="margin-top:96px">
+        <div class="item"><p class="caption muted">Tecnologia</p><h3>Pronto para crescer</h3><p>Next.js, TypeScript, PostgreSQL e Prisma — as mesmas tecnologias usadas por produtos de grande porte.</p></div>
+        <div class="item"><p class="caption muted">Segurança</p><h3>Dados protegidos</h3><p>Senhas criptografadas, sessões seguras, permissões validadas no servidor e proteção contra tentativas de invasão.</p></div>
+        <div class="item"><p class="caption muted">Qualidade</p><h3>55 testes automáticos</h3><p>Regras críticas (como dois clientes no mesmo horário) são verificadas automaticamente a cada mudança.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <a href="#topo" class="logo" style="font-size:44px"><span>mr.</span><b>mandu</b></a>
+    <p class="display end" style="margin-top:64px">Agende já.</p>
+    <div class="caption muted" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:48px">
+      <span>MR.MANDU BARBERS · Apresentação do projeto</span>
+      <span>Seu estilo. Nosso trabalho.</span>
+    </div>
+  </footer>
+
+  <dialog id="zoom" aria-label="Imagem ampliada">
+    <img alt="" />
+    <p class="caption">Clique ou pressione Esc para fechar</p>
+  </dialog>
+
+  <script>
+    // Abas por perfil
+    const tabs = document.querySelectorAll('[role="tab"]');
+    tabs.forEach((tab) => tab.addEventListener("click", () => {
+      tabs.forEach((t) => {
+        const active = t === tab;
+        t.setAttribute("aria-selected", String(active));
+        document.getElementById(t.getAttribute("aria-controls")).hidden = !active;
+      });
+    }));
+
+    // Ampliar capturas
+    const dialog = document.getElementById("zoom");
+    const big = dialog.querySelector("img");
+    document.querySelectorAll("[data-zoom]").forEach((el) => el.addEventListener("click", () => {
+      const img = el.querySelector("img");
+      big.src = img.src;
+      big.alt = img.alt;
+      dialog.showModal();
+    }));
+    dialog.addEventListener("click", () => dialog.close());
+
+    // Entrada suave das seções
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    }), { threshold: 0.08 });
+    document.querySelectorAll(".fade").forEach((el) => io.observe(el));
+  </script>
+</body>
+</html>

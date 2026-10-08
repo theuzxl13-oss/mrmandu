@@ -6,6 +6,8 @@ Plataforma de agendamento para barbearia, com três perfis de acesso (**Cliente*
 
 ![Home — mr.mandu](docs/screenshots/home-desktop.png)
 
+> 🎬 **Apresentação do projeto:** https://theuzxl13-oss.github.io/mrmandu/ (página estática em `docs/`, publicada pelo GitHub Pages)
+
 ## Visão geral (apresentação)
 
 **O problema:** agenda em papel/WhatsApp gera conflito de horário, falta de controle e cliente esperando resposta.
