@@ -1,0 +1,161 @@
+// MR.MANDU BARBERS — modelo de dados
+//
+// Decisões:
+// - Horários de agendamento são armazenados em UTC (timestamptz). A conversão
+//   para o fuso da barbearia acontece na camada de domínio (src/lib/time.ts).
+// - Valores monetários em centavos (Int) para evitar erros de ponto flutuante
+//   e problemas de serialização de Decimal entre servidor e cliente.
+// - O preço do serviço é "congelado" no agendamento (priceCents) para que o
+//   faturamento histórico não mude quando o preço do serviço for alterado.
+// - Conflitos de agenda são impedidos no banco por uma EXCLUSION CONSTRAINT
+//   (btree_gist) criada na migration inicial — ver migration.sql.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  BARBER
+  ADMIN
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @unique
+  phone          String?
+  passwordHash   String
+  role           Role     @default(CLIENT)
+  active         Boolean  @default(true)
+  /// Incrementado ao trocar senha / desativar: invalida sessões antigas.
+  sessionVersion Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  barber              Barber?
+  appointments        Appointment[]        @relation("ClientAppointments")
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([role])
+}
+
+model Barber {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  photo     String?
+  specialty String?
+  bio       String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments  Appointment[]
+  businessHours BusinessHours[]
+
+  @@index([active])
+}
+
+model Service {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  priceCents      Int
+  durationMinutes Int
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  appointments Appointment[]
+
+  @@index([active])
+}
+
+model Appointment {
+  id                 String            @id @default(cuid())
+  clientId           String
+  barberId           String
+  serviceId          String
+  /// Data local (fuso da barbearia) — facilita filtros e relatórios.
+  date               DateTime          @db.Date
+  startTime          DateTime          @db.Timestamptz(3)
+  endTime            DateTime          @db.Timestamptz(3)
+  status             AppointmentStatus @default(PENDING)
+  notes              String?
+  priceCents         Int
+  cancelledAt        DateTime?         @db.Timestamptz(3)
+  cancellationReason String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  client  User    @relation("ClientAppointments", fields: [clientId], references: [id], onDelete: Restrict)
+  barber  Barber  @relation(fields: [barberId], references: [id], onDelete: Restrict)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@index([barberId, startTime])
+  @@index([clientId, startTime])
+  @@index([date])
+  @@index([status])
+}
+
+/// barberId NULL  => horário geral de funcionamento da barbearia.
+/// barberId !NULL => jornada específica do barbeiro (sempre limitada pelo horário geral).
+/// Horários no formato "HH:mm" no fuso da barbearia. active=false => dia fechado / folga.
+model BusinessHours {
+  id         String  @id @default(cuid())
+  barberId   String?
+  dayOfWeek  Int
+  startTime  String
+  endTime    String
+  breakStart String?
+  breakEnd   String?
+  active     Boolean @default(true)
+
+  barber Barber? @relation(fields: [barberId], references: [id], onDelete: Cascade)
+
+  @@unique([barberId, dayOfWeek])
+}
+
+/// Configuração única (singleton, id = 1) da barbearia.
+model ShopSettings {
+  id                      Int      @id @default(1)
+  name                    String   @default("MR.MANDU BARBERS")
+  phone                   String?
+  whatsapp                String?
+  email                   String?
+  instagram               String?
+  address                 String?
+  city                    String?
+  about                   String?
+  slotIntervalMinutes     Int      @default(30)
+  minAdvanceMinutes       Int      @default(60)
+  maxAdvanceDays          Int      @default(60)
+  cancellationNoticeHours Int      @default(2)
+  updatedAt               DateTime @updatedAt
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
