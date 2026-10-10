@@ -101,8 +101,9 @@ export async function setClientActive(actor: SessionUser, input: unknown) {
   if (count === 0) throw new AppError("NOT_FOUND");
 }
 
+/** Lista enxuta de clientes para agendar em nome deles (admin e barbeiro). */
 export async function listClientOptions(actor: SessionUser) {
-  assertRole(actor, "ADMIN");
+  assertRole(actor, "ADMIN", "BARBER");
   return db.user.findMany({
     where: { role: "CLIENT", active: true },
     select: { id: true, name: true, email: true },

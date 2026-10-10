@@ -7,11 +7,11 @@ import { withActor } from "./run-action";
 const ALL_PANELS = ["/cliente", "/barbeiro", "/admin"];
 
 export async function getAvailabilityAction(input: unknown) {
-  return withActor(["CLIENT", "ADMIN"], (actor) => getAvailability(actor, input));
+  return withActor(["CLIENT", "ADMIN", "BARBER"], (actor) => getAvailability(actor, input));
 }
 
 export async function createAppointmentAction(input: unknown) {
-  return withActor(["CLIENT", "ADMIN"], (actor) => appointments.createAppointment(actor, input), {
+  return withActor(["CLIENT", "ADMIN", "BARBER"], (actor) => appointments.createAppointment(actor, input), {
     revalidate: ALL_PANELS,
     message: "Agendamento realizado com sucesso!",
   });

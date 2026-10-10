@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarCheck, CheckCheck, Clock, Hourglass } from "lucide-react";
+import { CalendarCheck, CheckCheck, Clock, Hourglass, Plus } from "lucide-react";
 import { DayTimeline } from "@/components/appointments/day-timeline";
 import { StatusBadge } from "@/components/appointments/status-badge";
 import { FlashNotice } from "@/components/layout/flash-notice";
@@ -23,9 +23,14 @@ export default async function BarbeiroDashboard({ searchParams }: { searchParams
   return (
     <div className="space-y-8">
       <FlashNotice params={params} />
-      <div>
-        <p className="eyebrow">{formatDateLong(today)}</p>
-        <h1 className="heading-display mt-2 text-3xl sm:text-4xl">Bom trabalho, {firstName(user.name)}</h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="eyebrow">{formatDateLong(today)}</p>
+          <h1 className="heading-display mt-2 text-3xl sm:text-4xl">Bom trabalho, {firstName(user.name)}</h1>
+        </div>
+        <Link href="/barbeiro/agendar" className={buttonVariants({ size: "lg" })}>
+          <Plus /> Novo agendamento
+        </Link>
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

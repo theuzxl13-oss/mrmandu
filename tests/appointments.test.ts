@@ -55,8 +55,39 @@ describe("3. Criação de agendamento", () => {
     await expect(book(s, s.ana)).rejects.toMatchObject({ code: "BARBER_UNAVAILABLE" });
   });
 
-  it("barbeiro não pode criar agendamentos", async () => {
-    await expect(book(s, s.joao)).rejects.toMatchObject({ code: "FORBIDDEN" });
+  it("barbeiro agenda um cliente sempre na PRÓPRIA agenda, já confirmado", async () => {
+    // Mesmo tentando indicar outro barbeiro, o agendamento vai para a agenda de quem está logado.
+    const appt = await createAppointment(
+      s.joao,
+      { clientId: s.ana.id, serviceId: s.corte.id, barberId: s.pedro.barberId, date: TUESDAY, time: "10:00" },
+      NOW,
+    );
+    expect(appt.barber.id).toBe(s.joao.barberId);
+    expect(appt.client.id).toBe(s.ana.id);
+    expect(appt.status).toBe("CONFIRMED");
+  });
+
+  it("barbeiro respeita conflitos e horário de funcionamento da própria agenda", async () => {
+    await book(s, s.ana); // João às 14:30
+    await expect(
+      createAppointment(s.joao, { clientId: s.bruno.id, serviceId: s.corte.id, barberId: s.joao.barberId, date: TUESDAY, time: "14:30" }, NOW),
+    ).rejects.toMatchObject({ code: "SLOT_UNAVAILABLE" });
+    await expect(
+      createAppointment(s.joao, { clientId: s.bruno.id, serviceId: s.corte.id, barberId: s.joao.barberId, date: TUESDAY, time: "12:00" }, NOW),
+    ).rejects.toMatchObject({ code: "OUTSIDE_BUSINESS_HOURS" });
+  });
+
+  it("barbeiro exige um cliente válido e só consulta horários da própria agenda", async () => {
+    await expect(
+      createAppointment(s.joao, { serviceId: s.corte.id, barberId: s.joao.barberId, date: TUESDAY, time: "10:00" }, NOW),
+    ).rejects.toThrow();
+    await expect(
+      createAppointment(s.joao, { clientId: s.admin.id, serviceId: s.corte.id, barberId: s.joao.barberId, date: TUESDAY, time: "10:00" }, NOW),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+    await book(s, s.ana, { barberId: s.pedro.barberId }); // Pedro ocupado 14:30
+    const { slots } = await getAvailability(s.joao, { serviceId: s.corte.id, barberId: s.pedro.barberId, date: TUESDAY }, NOW);
+    // Consulta forçada para a agenda do João (livre às 14:30), não a do Pedro.
+    expect(slots.find((x) => x.time === "14:30")?.available).toBe(true);
   });
 });
 

@@ -484,6 +484,7 @@
   const barberNav = [
     { href: "#/barbeiro", label: "Hoje", icon: "dash", exact: true },
     { href: "#/barbeiro/agenda", label: "Agenda", icon: "calendar" },
+    { href: "#/barbeiro/novo", label: "Novo agendamento", icon: "plus" },
   ];
   const adminNav = () => [
     { href: "#/admin", label: "Dashboard", icon: "dash", exact: true },
@@ -583,7 +584,8 @@
 
   function wizardView() {
     const w = ui.wiz;
-    const admin = w.mode === "admin";
+    const admin = w.mode !== "client"; // equipe (admin ou barbeiro) agenda em nome de um cliente
+    const locked = w.mode === "barber"; // barbeiro fixo: pula a etapa de escolha do barbeiro
     const svc = w.serviceId && svcOf(w.serviceId);
     const barber = w.barberId && w.barberId !== "any" ? barberOf(w.barberId) : null;
     const STEPS = ["Serviço", "Barbeiro", "Data", "Horário", "Resumo"];
@@ -593,7 +595,7 @@
         <p style="font-size:56px">✓</p><h1 class="title" style="margin-top:8px">Agendamento realizado com sucesso!</h1>
         <p class="muted" style="margin-top:12px">${a.status === "PENDING" ? "Seu horário foi reservado e aguarda confirmação da barbearia." : "Horário confirmado."}</p>
         <dl class="summary box pad" style="text-align:left;margin-top:28px">${[["Serviço", svcOf(a.serviceId).name], ["Barbeiro", barberOf(a.barberId).name], ["Data", fmtDate(a.date)], ["Horário", a.start], ["Valor", money(a.price)], ...(admin ? [["Cliente", clientOf(a.clientId).name]] : [])].map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
-        <div class="actions" style="justify-content:center;margin-top:28px"><a class="btn lg" href="${admin ? "#/admin/agendamentos" : "#/cliente/agendamentos"}">${admin ? "Ver agendamentos" : "Ver meus horários"}</a><button class="btn lg outline" data-act="wiz-restart">Novo agendamento</button></div></div>`;
+        <div class="actions" style="justify-content:center;margin-top:28px"><a class="btn lg" href="${locked ? `#/barbeiro/agenda?d=${a.date}` : admin ? "#/admin/agendamentos" : "#/cliente/agendamentos"}">${locked ? "Ver na minha agenda" : admin ? "Ver agendamentos" : "Ver meus horários"}</a><button class="btn lg outline" data-act="wiz-restart">Novo agendamento</button></div></div>`;
     }
     const closed = S.hours.filter((h) => !h.active).map((h) => h.day);
     let body = "";
@@ -610,17 +612,17 @@
       const ids = w.barberId === "any" ? activeBarbers().map((b) => b.id) : [w.barberId];
       body = `<h2 class="title" style="font-size:28px">Escolha o horário</h2><p class="muted" style="margin:6px 0 20px;font-size:14px">${fmtLong(w.date)}</p>${slotsView(availability(ids, w.date, svc.dur, null, !admin), w.time, "wiz-time")}`;
     } else {
-      body = `<h2 class="title" style="font-size:28px">Confirme seu agendamento</h2><div class="box pad" style="margin-top:20px">
+      body = `<h2 class="title" style="font-size:28px">${admin ? "Confirme o agendamento" : "Confirme seu agendamento"}</h2><div class="box pad" style="margin-top:20px">
         <dl class="summary big">${[["Serviço", svc.name], ["Barbeiro", barber ? barber.name : "Qualquer barbeiro disponível"], ["Data", fmtDate(w.date)], ["Horário", w.time], ["Valor", money(svc.price)]].map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
         ${admin ? `<div class="field" style="margin-top:24px"><label for="wiz-client">Cliente</label><select class="input" id="wiz-client" data-act-change="wiz-client"><option value="">Selecione o cliente</option>${S.clients.filter((c) => c.active).map((c) => `<option value="${c.id}" ${c.id === w.clientId ? "selected" : ""}>${esc(c.name)} — ${esc(c.email)}</option>`).join("")}</select></div>` : ""}
         <div class="field" style="margin-top:24px"><label for="wiz-notes">Observações (opcional)</label><textarea class="input" id="wiz-notes" maxlength="500" data-act-change="wiz-notes" placeholder="Alguma preferência para o atendimento?">${esc(w.notes)}</textarea></div>
         <button class="btn lg block" style="margin-top:24px" data-act="wiz-confirm" ${admin && !w.clientId ? "disabled" : ""}>${icon("check")} Confirmar agendamento</button></div>`;
     }
     const canNext = [!!w.serviceId, !!w.barberId, !!w.date, !!w.time, false][w.step];
-    return `<div class="steps">${STEPS.map((s, i) => `<button type="button" data-act="wiz-step" data-step="${i}" ${i < w.step ? "" : "disabled"} style="text-align:left" class="${i === w.step ? "cur" : ""}"><div class="${i <= w.step ? "on" : ""}"></div><span>${i + 1}. ${s}</span></button>`).join("")}</div>
+    return `<div class="steps">${STEPS.map((s, i) => `<button type="button" data-act="wiz-step" data-step="${i}" ${i < w.step && !(locked && i === 1) ? "" : "disabled"} style="text-align:left" class="${i === w.step ? "cur" : ""}"><div class="${i <= w.step ? "on" : ""}"></div><span>${i + 1}. ${s}</span></button>`).join("")}</div>
       <div class="wiz"><section class="fadein">${body}</section>
       <aside class="box pad" style="align-self:start"><p class="cap muted" style="margin-bottom:16px">Seu agendamento</p><dl class="summary">${[["Serviço", svc ? svc.name : "—"], ["Barbeiro", w.barberId === "any" ? "Qualquer disponível" : barber ? barber.name : "—"], ["Data", w.date ? fmtDate(w.date) : "—"], ["Horário", w.time || "—"], ["Valor", svc ? money(svc.price) : "—"]].map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl></aside></div>
-      <div class="stickybar">${w.step > 0 ? `<button class="btn lg outline" data-act="wiz-step" data-step="${w.step - 1}">${icon("left")} Voltar</button>` : ""}${w.step < 4 ? `<button class="btn lg" style="margin-left:auto" data-act="wiz-step" data-step="${w.step + 1}" ${canNext ? "" : "disabled"}>Continuar ${icon("arrow")}</button>` : ""}</div>`;
+      <div class="stickybar">${w.step > 0 ? `<button class="btn lg outline" data-act="wiz-step" data-step="${locked && w.step === 2 ? 0 : w.step - 1}">${icon("left")} Voltar</button>` : ""}${w.step < 4 ? `<button class="btn lg" style="margin-left:auto" data-act="wiz-step" data-step="${locked && w.step === 0 ? 2 : w.step + 1}" ${canNext ? "" : "disabled"}>Continuar ${icon("arrow")}</button>` : ""}</div>`;
   }
 
   // ---- Barbeiro ----
@@ -629,14 +631,14 @@
     const mine = S.appts.filter((a) => a.barberId === u.id);
     const today = mine.filter((a) => a.date === t && a.status !== "CANCELLED");
     const next = mine.filter((a) => ACTIVE.includes(a.status) && (a.date > t || (a.date === t && toMin(a.end) > nowMin()))).sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start))[0];
-    return `<div class="page-head"><div><p class="cap muted">${fmtLong(t)}</p><h1 class="title" style="margin-top:8px">Bom trabalho, ${esc(u.name)}</h1></div></div>
+    return `<div class="page-head"><div><p class="cap muted">${fmtLong(t)}</p><h1 class="title" style="margin-top:8px">Bom trabalho, ${esc(u.name)}</h1></div><button class="btn lg" data-act="barber-new">${icon("plus")} Novo agendamento</button></div>
       <div class="grid g2 g4">${[["Hoje", today.length, "agendamentos"], ["Próximo", next ? next.start : "—", next ? `${fmtShort(next.date)} · ${esc(clientOf(next.clientId).name)}` : "nenhum"], ["Pendentes", mine.filter((a) => a.status === "PENDING" && a.date >= t).length, "aguardando confirmação"], ["Concluídos", mine.filter((a) => a.status === "COMPLETED").length, "no total"]].map(([a, b, c]) => `<div class="stat"><span class="cap muted">${a}</span><b>${b}</b><small>${c}</small></div>`).join("")}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin:36px 0 12px"><p class="cap muted">Agenda de hoje</p><a class="cap" style="font-weight:700" href="#/barbeiro/agenda">Ver semana →</a></div>
       ${timeline(u.id, t, "BARBER")}`;
   }
 
   function barberAgenda(u, date) {
-    return `<div class="page-head"><div><h1 class="title">Minha agenda</h1><p>Somente os seus atendimentos.</p></div></div>
+    return `<div class="page-head"><div><h1 class="title">Minha agenda</h1><p>Somente os seus atendimentos.</p></div><button class="btn" data-act="barber-new">${icon("plus")} Novo agendamento</button></div>
       ${weekStrip(u.id, date, "#/barbeiro/agenda")}${dateBar(date, "#/barbeiro/agenda")}${timeline(u.id, date, "BARBER")}`;
   }
 
@@ -822,7 +824,13 @@
         else body = clientHome(u);
         html = shell(u, clientNav, body);
       } else if (need === "BARBER") {
-        html = shell(u, barberNav, sub === "agenda" ? barberAgenda(u, date) : barberHome(u));
+        let body;
+        if (sub === "agenda") body = barberAgenda(u, date);
+        else if (sub === "novo") {
+          if (!ui.wiz || ui.wiz.mode !== "barber") startWizard({ mode: "barber", barberId: u.id });
+          body = `<h1 class="title">Novo agendamento</h1><p class="muted" style="margin:8px 0 28px;font-size:14px">Agende um cliente na sua agenda. O horário já entra como confirmado.</p>${wizardView()}`;
+        } else body = barberHome(u);
+        html = shell(u, barberNav, body);
       } else {
         let body;
         if (sub === "agenda") body = r.parts[2] ? adminBarberAgenda(r.parts[2], date) : adminAgenda(date);
@@ -907,19 +915,23 @@
       if (ui.modal && ui.modal.type === "resched") renderModal(); else rerender();
     },
     "close-modal": closeModal,
-    "wiz-service": (el) => { ui.wiz.serviceId = el.dataset.id; ui.wiz.time = null; ui.wiz.step = 1; rerender(); },
+    "wiz-service": (el) => { ui.wiz.serviceId = el.dataset.id; ui.wiz.time = null; ui.wiz.step = ui.wiz.mode === "barber" ? 2 : 1; rerender(); },
     "wiz-barber": (el) => { ui.wiz.barberId = el.dataset.id; ui.wiz.time = null; ui.wiz.step = 2; rerender(); },
     "wiz-date": (el) => { ui.wiz.date = el.dataset.date; ui.wiz.time = null; ui.wiz.step = 3; rerender(); },
     "wiz-time": (el) => { ui.wiz.time = el.dataset.time; ui.wiz.step = 4; rerender(); },
     "wiz-step": (el) => { ui.wiz.step = Number(el.dataset.step); rerender(); },
-    "wiz-restart": () => { startWizard({ mode: ui.wiz.mode }); rerender(); },
+    "wiz-restart": () => { const mode = ui.wiz.mode; startWizard({ mode, barberId: mode === "barber" ? me().id : undefined }); rerender(); },
     "wiz-confirm": () => {
       const w = ui.wiz, u = me();
       const notes = document.getElementById("wiz-notes")?.value.trim().slice(0, 500) || "";
-      const res = createAppointment({ clientId: w.mode === "admin" ? w.clientId : u.id, serviceId: w.serviceId, barberId: w.barberId, date: w.date, time: w.time, notes }, w.mode === "admin");
+      const staff = w.mode !== "client";
+      // Barbeiro agenda sempre na própria agenda
+      const barberId = w.mode === "barber" ? u.id : w.barberId;
+      const res = createAppointment({ clientId: staff ? w.clientId : u.id, serviceId: w.serviceId, barberId, date: w.date, time: w.time, notes }, staff);
       if (res.error) { toast(res.error, false); w.time = null; w.step = 3; rerender(); return; }
       w.done = res.appt.id; toast("Agendamento realizado com sucesso!"); rerender(); window.scrollTo({ top: 0 });
     },
+    "barber-new": () => { startWizard({ mode: "barber", barberId: me().id }); go("#/barbeiro/novo"); },
     "admin-new": (el) => { startWizard({ mode: "admin", barberId: el.dataset.barber }); go("#/admin/novo"); },
     "clear-filters": () => { ui.filters = { status: "", barberId: "", date: "" }; rerender(); },
     "client-detail": (el) => { ui.modal = { type: "client-detail", clientId: el.dataset.id }; renderModal(); },

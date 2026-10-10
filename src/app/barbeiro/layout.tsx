@@ -11,6 +11,7 @@ export default async function BarbeiroLayout({ children }: { children: React.Rea
         { href: "/barbeiro", label: "Hoje", icon: "dashboard", exact: true },
         { href: "/barbeiro/agenda", label: "Agenda", icon: "calendar" },
         { href: "/barbeiro/agendamentos", label: "Agendamentos", icon: "list" },
+        { href: "/barbeiro/agendar", label: "Novo agendamento", icon: "plus" },
       ]}
     >
       {children}

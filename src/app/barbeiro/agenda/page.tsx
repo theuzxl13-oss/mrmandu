@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { Plus } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 import { DateNav } from "@/components/appointments/date-nav";
 import { DayTimeline } from "@/components/appointments/day-timeline";
 import { WeekStrip } from "@/components/appointments/week-strip";
@@ -16,7 +19,14 @@ export default async function BarbeiroAgendaPage({ searchParams }: { searchParam
   const [[schedule], week] = await Promise.all([getDaySchedules(user, date), getWeekSummary(user, user.barberId ?? "", weekStart)]);
   return (
     <div>
-      <PageHeader title="Minha agenda" />
+      <PageHeader
+        title="Minha agenda"
+        actions={
+          <Link href="/barbeiro/agendar" className={buttonVariants()}>
+            <Plus /> Novo agendamento
+          </Link>
+        }
+      />
       <div className="mb-4">
         <WeekStrip days={week} selected={date} hrefFor={(d) => `/barbeiro/agenda?data=${d}`} />
       </div>

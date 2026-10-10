@@ -157,8 +157,13 @@ export async function computeAvailability(opts: ComputeOptions): Promise<Availab
 
 /** Horários disponíveis para o fluxo de agendamento (serviço + barbeiro|qualquer + data). */
 export async function getAvailability(actor: SessionUser, input: unknown, now = new Date()): Promise<AvailabilityResult> {
-  assertRole(actor, "CLIENT", "ADMIN");
+  assertRole(actor, "CLIENT", "ADMIN", "BARBER");
   const query = availabilityQuerySchema.parse(input);
+  // Barbeiro só consulta a própria agenda.
+  if (actor.role === "BARBER") {
+    if (!actor.barberId) throw new AppError("FORBIDDEN");
+    query.barberId = actor.barberId;
+  }
 
   const [service, settings] = await Promise.all([
     db.service.findUnique({ where: { id: query.serviceId } }),

@@ -76,6 +76,7 @@ Plataforma de agendamento para barbearia, com três perfis de acesso (**Cliente*
 - Dashboard do dia (agendamentos de hoje, próximo atendimento, pendentes, total concluído).
 - Agenda em linha do tempo (`08:00 — Livre`, `08:30 — João · Corte`…), navegação por data.
 - Confirmar, cancelar, reagendar, concluir e anotar observações — **somente nos próprios atendimentos**.
+- **Novo agendamento**: agenda um cliente direto na própria agenda (já confirmado), com as mesmas regras de horário.
 
 **Administrador** (`/admin`)
 - Dashboard: agendamentos hoje, clientes, concluídos e faturamento do mês, pendentes, gráficos de 7 dias, agenda do dia.

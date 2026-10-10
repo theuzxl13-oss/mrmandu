@@ -185,13 +185,18 @@ async function rankBarbersByLoad(date: DateKey): Promise<string[]> {
 /**
  * Cria um agendamento.
  * CLIENTE: sempre para si mesmo. ADMIN: em nome de um cliente (clientId).
+ * BARBEIRO: em nome de um cliente, sempre na PRÓPRIA agenda (o barberId enviado é ignorado).
  */
 export async function createAppointment(actor: SessionUser, input: unknown, now = new Date()): Promise<AppointmentDTO> {
-  assertRole(actor, "CLIENT", "ADMIN");
+  assertRole(actor, "CLIENT", "ADMIN", "BARBER");
   let clientId: string;
   let data;
-  if (actor.role === "ADMIN") {
+  if (actor.role === "ADMIN" || actor.role === "BARBER") {
     const parsed = adminCreateAppointmentSchema.parse(input);
+    if (actor.role === "BARBER") {
+      if (!actor.barberId) throw new AppError("FORBIDDEN");
+      parsed.barberId = actor.barberId;
+    }
     const client = await db.user.findUnique({ where: { id: parsed.clientId }, select: { role: true, active: true } });
     if (!client || client.role !== "CLIENT" || !client.active) throw new AppError("NOT_FOUND", "Cliente não encontrado ou inativo.");
     clientId = parsed.clientId;
@@ -228,7 +233,8 @@ export async function createAppointment(actor: SessionUser, input: unknown, now 
             endTime,
             priceCents: service.priceCents,
             notes: data.notes,
-            status: actor.role === "ADMIN" ? "CONFIRMED" : "PENDING",
+            // Criado pela equipe (admin/barbeiro) já nasce confirmado.
+            status: actor.role === "CLIENT" ? "PENDING" : "CONFIRMED",
           },
           include: appointmentInclude,
         });

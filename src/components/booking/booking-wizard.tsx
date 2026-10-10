@@ -34,13 +34,15 @@ interface BookingWizardProps {
   closedWeekdays: number[];
   initialServiceId?: string;
   initialBarberId?: string;
-  /** Modo admin: agenda em nome de um cliente. */
+  /** Modo equipe (admin/barbeiro): agenda em nome de um cliente. */
   clients?: ClientOption[];
+  /** Barbeiro fixo (agenda do próprio barbeiro): pula a etapa de escolha do barbeiro. */
+  lockBarber?: boolean;
   successHref: string;
 }
 
 export function BookingWizard(props: BookingWizardProps) {
-  const { services, barbers, today, maxDate, closedWeekdays, clients, successHref } = props;
+  const { services, barbers, today, maxDate, closedWeekdays, clients, successHref, lockBarber = false } = props;
   const validService = services.some((s) => s.id === props.initialServiceId) ? props.initialServiceId! : null;
   const validBarber = barbers.some((b) => b.id === props.initialBarberId) ? props.initialBarberId! : null;
 
@@ -155,8 +157,8 @@ export function BookingWizard(props: BookingWizardProps) {
           <li key={label}>
             <button
               type="button"
-              onClick={() => i < step && setStep(i)}
-              disabled={i >= step}
+              onClick={() => i < step && !(lockBarber && i === 1) && setStep(i)}
+              disabled={i >= step || (lockBarber && i === 1)}
               className="w-full text-left disabled:cursor-default"
               aria-current={i === step ? "step" : undefined}
             >
@@ -182,7 +184,7 @@ export function BookingWizard(props: BookingWizardProps) {
                     onClick={() => {
                       setServiceId(s.id);
                       setTime(null);
-                      setStep(1);
+                      setStep(lockBarber ? 2 : 1);
                     }}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -278,7 +280,7 @@ export function BookingWizard(props: BookingWizardProps) {
           )}
 
           {step === 4 && service && date && time && (
-            <StepTitle title="Confirme seu agendamento">
+            <StepTitle title={clients ? "Confirme o agendamento" : "Confirme seu agendamento"}>
               <div className="rounded-lg border bg-card p-5 sm:p-8">
                 <Summary
                   large
@@ -334,12 +336,12 @@ export function BookingWizard(props: BookingWizardProps) {
       <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 p-4 backdrop-blur md:static md:mt-8 md:border-0 md:bg-transparent md:p-0">
         <div className="mx-auto flex max-w-7xl gap-3">
           {step > 0 && (
-            <Button variant="outline" size="lg" className="flex-1 md:flex-none" onClick={() => setStep(step - 1)}>
+            <Button variant="outline" size="lg" className="flex-1 md:flex-none" onClick={() => setStep(lockBarber && step === 2 ? 0 : step - 1)}>
               <ArrowLeft /> Voltar
             </Button>
           )}
           {step < 4 ? (
-            <Button size="lg" className="flex-1 md:ml-auto md:flex-none" disabled={!canAdvance} onClick={() => setStep(step + 1)}>
+            <Button size="lg" className="flex-1 md:ml-auto md:flex-none" disabled={!canAdvance} onClick={() => setStep(lockBarber && step === 0 ? 2 : step + 1)}>
               Continuar <ArrowRight />
             </Button>
           ) : (
