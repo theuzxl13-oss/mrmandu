@@ -6,7 +6,9 @@ Plataforma de agendamento para barbearia, com três perfis de acesso (**Cliente*
 
 ![Home — mr.mandu](docs/screenshots/home-desktop.png)
 
-> 🎬 **Apresentação do projeto:** https://theuzxl13-oss.github.io/mrmandu/ (página estática em `docs/`, publicada pelo GitHub Pages)
+> 🎬 **Apresentação do projeto:** https://theuzxl13-oss.github.io/mrmandu/
+>
+> 🕹️ **Demonstração interativa (navegue e teste):** https://theuzxl13-oss.github.io/mrmandu/demo/ — roda inteira no navegador, com dados fictícios salvos só no seu aparelho (código em `docs/demo/`, independente do sistema real).
 
 [![Abrir no GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/theuzxl13-oss/mrmandu?ref=claude/nifty-cerf-87tt09)
 
