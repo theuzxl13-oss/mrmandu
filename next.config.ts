@@ -8,9 +8,16 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
+// Origens extras aceitas pelas Server Actions (ex.: link de preview do Codespaces).
+const allowedOrigins = (process.env.SERVER_ACTIONS_ALLOWED_ORIGINS ?? "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  experimental: allowedOrigins.length ? { serverActions: { allowedOrigins } } : undefined,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

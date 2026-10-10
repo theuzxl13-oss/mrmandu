@@ -8,6 +8,10 @@ Plataforma de agendamento para barbearia, com três perfis de acesso (**Cliente*
 
 > 🎬 **Apresentação do projeto:** https://theuzxl13-oss.github.io/mrmandu/ (página estática em `docs/`, publicada pelo GitHub Pages)
 
+[![Abrir no GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/theuzxl13-oss/mrmandu?ref=claude/nifty-cerf-87tt09)
+
+> 🧪 **Ver o sistema funcionando e editar pelo navegador:** clique no botão acima. Veja [Rodar no GitHub Codespaces](#rodar-no-github-codespaces).
+
 ## Visão geral (apresentação)
 
 **O problema:** agenda em papel/WhatsApp gera conflito de horário, falta de controle e cliente esperando resposta.
@@ -40,6 +44,7 @@ Plataforma de agendamento para barbearia, com três perfis de acesso (**Cliente*
 - [Funcionalidades](#funcionalidades)
 - [Tecnologias](#tecnologias)
 - [Requisitos](#requisitos)
+- [Rodar no GitHub Codespaces](#rodar-no-github-codespaces)
 - [Instalação e execução](#instalação-e-execução)
 - [Variáveis de ambiente](#variáveis-de-ambiente)
 - [Banco de dados, migrações e seed](#banco-de-dados-migrações-e-seed)
@@ -107,6 +112,20 @@ Plataforma de agendamento para barbearia, com três perfis de acesso (**Cliente*
 
 ---
 
+## Rodar no GitHub Codespaces
+
+Forma mais fácil de ver o sistema **funcionando de verdade** e fazer alterações, sem instalar nada no computador:
+
+1. Clique em **[Abrir no Codespaces](https://codespaces.new/theuzxl13-oss/mrmandu?ref=claude/nifty-cerf-87tt09)** → **Create codespace**.
+2. Aguarde a preparação automática (≈ 3–5 min na primeira vez): instala dependências, cria o banco PostgreSQL, aplica as migrações e carrega os dados de demonstração (`.devcontainer/setup.sh`).
+3. O sistema sobe sozinho na porta **3000** e abre uma prévia. Para abrir em outra aba: aba **PORTS** → porta 3000 → ícone 🌐.
+4. Edite os arquivos no editor (ex.: `src/app/page.tsx`); a página atualiza automaticamente ao salvar.
+5. Para guardar as alterações no GitHub: ícone **Source Control** (barra lateral) → mensagem → **Commit** → **Sync Changes**.
+
+Para mostrar a alguém de fora: na aba **PORTS**, clique com o botão direito na porta 3000 → **Port Visibility → Public** e envie o link. O link funciona enquanto o Codespace estiver ligado (ele desliga após ~30 min sem uso; os dados ficam salvos para a próxima vez).
+
+> O plano gratuito do GitHub inclui horas mensais de Codespaces. Desligue/exclua o Codespace em https://github.com/codespaces quando não estiver usando.
+
 ## Instalação e execução
 
 ```bash
@@ -145,6 +164,7 @@ Scripts úteis: `npm run lint`, `npm run typecheck`, `npm test`, `npm run db:stu
 | `AUTH_TRUST_HOST` | atrás de proxy | `true` quando o host público difere do interno |
 | `NEXT_PUBLIC_SHOP_TIMEZONE` | não | Fuso IANA da barbearia (padrão `America/Sao_Paulo`) |
 | `SEED_PASSWORD` | não | Senha dos usuários criados pelo seed (padrão `Mandu@2026`) |
+| `SERVER_ACTIONS_ALLOWED_ORIGINS` | não | Origens extras aceitas pelas Server Actions, separadas por vírgula (o Codespaces usa `*.app.github.dev`) |
 
 Para os testes, copie `.env.test.example` para `.env.test` (o banco **precisa** conter `test` no nome — proteção contra rodar testes no banco errado).
 
